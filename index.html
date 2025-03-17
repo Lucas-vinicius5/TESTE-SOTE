@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>Controle de Dados</h1>
-        <form id="dataForm">
+        <form id="dataForm" onsubmit="event.preventDefault(); insertData();">
             <input type="text" id="numeroPedido" placeholder="Número do Pedido" required>
             <input type="text" id="cliente" placeholder="Cliente" required>
             <input type="text" id="codigo" placeholder="Código" required>
