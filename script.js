@@ -1,93 +1,93 @@
-const SPREADSHEET_ID = "1jLGdcmLq-4BgaYwXN9WewsH4slUDTwKA5H4XEsMIv5w"; // ID da sua planilha
-const SHEET_NAME = "Dados Site"; // Nome da aba
-const API_KEY = "AIzaSyDJcmG7-_yl0TXrbRbF6u4U0lfvmL-SXhA"; // Sua chave de API
+const SHEET_ID = '1jLGdcmLq-4BgaYwXN9WewsH4slUDTwKA5H4XEsMIv5w';
+const API_KEY = 'AIzaSyDJcmG7-_yl0TXrbRbF6u4U0lfvmL-SXhA';
+const SHEET_NAME = 'Dados Site';
 
-// Função para incluir dados
-async function insertData() {
-    const data = {
-        values: [
-            [
-                document.getElementById("numeroPedido").value,
-                document.getElementById("cliente").value,
-                document.getElementById("codigo").value,
-                document.getElementById("descricao").value,
-                document.getElementById("prioridade").value,
-                document.getElementById("progresso").value,
-                document.getElementById("status").value,
-                new Date().toLocaleDateString() // Data atual
-            ]
-        ]
-    };
+document.getElementById('dataForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Array.from(formData.values());
+    appendData(data);
+});
 
-    try {
-        const response = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H2:append?valueInputOption=RAW&key=${API_KEY}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            }
-        );
-
-        const result = await response.json();
-        console.log(result); // Verifique o resultado no console
-        alert("Dados incluídos com sucesso!");
-        loadData(); // Recarrega os dados após a inserção
-    } catch (error) {
-        console.error("Erro ao incluir dados:", error);
-        alert("Erro ao incluir dados. Verifique o console para mais detalhes.");
-    }
+function appendData(data) {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H:append?valueInputOption=RAW`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+            values: [data]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Dados inseridos com sucesso:', data);
+        loadData();
+    })
+    .catch(error => console.error('Erro ao inserir dados:', error));
 }
 
-// Função para carregar dados
-async function loadData() {
-    try {
-        const response = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`
-        );
-        const data = await response.json();
-        renderTable(data.values); // Renderiza os dados na tabela
-    } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        alert("Erro ao carregar dados. Verifique o console para mais detalhes.");
-    }
+function loadData() {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        data.values.forEach((row, index) => {
+            const newRow = tableBody.insertRow();
+            row.forEach((cell, cellIndex) => {
+                const newCell = newRow.insertCell(cellIndex);
+                newCell.textContent = cell;
+            });
+            const actionCell = newRow.insertCell(row.length);
+            actionCell.innerHTML = `<button onclick="editData(${index + 2})">Editar</button> <button onclick="deleteData(${index + 2})">Excluir</button>`;
+        });
+    })
+    .catch(error => console.error('Erro ao carregar dados:', error));
 }
 
-// Função para renderizar a tabela
-function renderTable(data) {
-    const table = document.getElementById("dataTable");
-    if (!data || data.length === 0) {
-        table.innerHTML = "<p>Nenhum dado encontrado.</p>";
-        return;
-    }
-
-    let html = "<table border='1'><tr><th>Número do Pedido</th><th>Cliente</th><th>Código</th><th>Descrição</th><th>Prioridade</th><th>Progresso</th><th>Status</th><th>Data</th></tr>";
-
-    data.forEach(row => {
-        html += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td><td>${row[5]}</td><td>${row[6]}</td><td>${row[7]}</td></tr>`;
-    });
-
-    html += "</table>";
-    table.innerHTML = html;
+function searchData() {
+    const searchValue = document.getElementById('searchInput').value;
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+        const filteredData = data.values.filter(row => row[0] === searchValue);
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        filteredData.forEach(row => {
+            const newRow = tableBody.insertRow();
+            row.forEach((cell, cellIndex) => {
+                const newCell = newRow.insertCell(cellIndex);
+                newCell.textContent = cell;
+            });
+            const actionCell = newRow.insertCell(row.length);
+            actionCell.innerHTML = `<button onclick="editData(${data.values.indexOf(row) + 2})">Editar</button> <button onclick="deleteData(${data.values.indexOf(row) + 2})">Excluir</button>`;
+        });
+    })
+    .catch(error => console.error('Erro ao pesquisar dados:', error));
 }
 
-// Função para pesquisar dados
-async function searchData() {
-    const searchValue = document.getElementById("searchInput").value;
-    try {
-        const response = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`
-        );
-        const data = await response.json();
-        const filteredData = data.values.filter(row => row[0] === searchValue); // Filtra pelo número do pedido
-        renderTable(filteredData); // Renderiza os dados filtrados
-    } catch (error) {
-        console.error("Erro ao pesquisar dados:", error);
-        alert("Erro ao pesquisar dados. Verifique o console para mais detalhes.");
-    }
+function editData(rowIndex) {
+    // Implementar a lógica para editar dados
+    console.log('Editar linha:', rowIndex);
 }
 
-// Função para apagar dados (ainda não implementada)
-async function
+function deleteData(rowIndex) {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?valueInputOption=RAW`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Dados excluídos com sucesso:', data);
+        loadData();
+    })
+    .catch(error => console.error('Erro ao excluir dados:', error));
+}
+
+// Carregar dados ao iniciar
+loadData();
