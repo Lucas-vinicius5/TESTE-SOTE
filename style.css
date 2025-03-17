@@ -1,45 +1,36 @@
-const API_KEY = 'AIzaSyDJcmG7-_yl0TXrbRbF6u4U0lfvmL-SXhA';
-const SPREADSHEET_ID = '1jLGdcmLq-4BgaYwXN9WewsH4slUDTwKA5H4XEsMIv5w';
-const RANGE = 'Dados Site!A2:H';
-
-document.getElementById('dataForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = Array.from(formData.values());
-    appendData(data);
-});
-
-function appendData(data) {
-    const values = [data];
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}:append?valueInputOption=RAW&key=${API_KEY}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            values: values
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Dados inseridos com sucesso:', data);
-        loadData();
-    })
-    .catch(error => console.error('Erro ao inserir dados:', error));
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
 }
 
-function loadData() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`)
-    .then(response => response.json())
-    .then(data => {
-        const table = document.getElementById('dataTable');
-        table.innerHTML = '<table border="1"><tr><th>Número do Pedido</th><th>Cliente</th><th>Código</th><th>Descrição</th><th>Prioridade</th><th>Progresso</th><th>Status</th><th>Data</th></tr>';
-        data.values.forEach(row => {
-            table.innerHTML += `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
-        });
-        table.innerHTML += '</table>';
-    })
-    .catch(error => console.error('Erro ao carregar dados:', error));
+form {
+    margin-bottom: 20px;
 }
 
-loadData();
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input, button {
+    margin-top: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+button {
+    cursor: pointer;
+}
