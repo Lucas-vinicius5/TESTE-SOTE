@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Dados</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Dados</h1>
+        <form id="dataForm">
+            <input type="text" id="numeroPedido" placeholder="Número do Pedido" required>
+            <input type="text" id="cliente" placeholder="Cliente" required>
+            <input type="text" id="codigo" placeholder="Código" required>
+            <input type="text" id="descricao" placeholder="Descrição" required>
+            <input type="text" id="prioridade" placeholder="Prioridade" required>
+            <input type="text" id="progresso" placeholder="Progresso" required>
+            <input type="text" id="status" placeholder="Status" required>
+            <button type="submit">Incluir Dados</button>
+        </form>
+
+        <div class="actions">
+            <input type="text" id="searchInput" placeholder="Pesquisar por Número do Pedido">
+            <button onclick="searchData()">Pesquisar</button>
+            <button onclick="deleteData()">Apagar</button>
+            <button onclick="updateData()">Modificar</button>
+        </div>
+
+        <div id="chart"></div>
+        <div id="dataTable"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
