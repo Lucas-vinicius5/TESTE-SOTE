@@ -22,11 +22,7 @@
         <input type="text" id="description" name="description" required>
 
         <label for="priority">Prioridade:</label>
-        <select id="priority" name="priority" required>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-        </select>
+        <input type="text" id="priority" name="priority" required>
 
         <label for="progress">Progresso:</label>
         <input type="text" id="progress" name="progress" required>
@@ -40,8 +36,29 @@
         <button type="submit">Incluir Dados</button>
     </form>
 
-    <div id="dataTable"></div>
-    <div id="chart"></div>
+    <h2>Pesquisar Dados</h2>
+    <input type="text" id="searchInput" placeholder="Pesquisar por Número do Pedido">
+    <button onclick="searchData()">Pesquisar</button>
+
+    <h2>Dados</h2>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Número do Pedido</th>
+                <th>Cliente</th>
+                <th>Código</th>
+                <th>Descrição</th>
+                <th>Prioridade</th>
+                <th>Progresso</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão inseridos aqui via JavaScript -->
+        </tbody>
+    </table>
 
     <script src="script.js"></script>
 </body>
