@@ -4,32 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Dados</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Controle de Dados</h1>
-        <form id="dataForm" onsubmit="event.preventDefault(); insertData();">
-            <input type="text" id="numeroPedido" placeholder="Número do Pedido" required>
-            <input type="text" id="cliente" placeholder="Cliente" required>
-            <input type="text" id="codigo" placeholder="Código" required>
-            <input type="text" id="descricao" placeholder="Descrição" required>
-            <input type="text" id="prioridade" placeholder="Prioridade" required>
-            <input type="text" id="progresso" placeholder="Progresso" required>
-            <input type="text" id="status" placeholder="Status" required>
-            <button type="submit">Incluir Dados</button>
-        </form>
+    <h1>Controle de Dados</h1>
+    <form id="dataForm">
+        <label for="orderNumber">Número do Pedido:</label>
+        <input type="text" id="orderNumber" name="orderNumber" required>
 
-        <div class="actions">
-            <input type="text" id="searchInput" placeholder="Pesquisar por Número do Pedido">
-            <button onclick="searchData()">Pesquisar</button>
-            <button onclick="deleteData()">Apagar</button>
-            <button onclick="updateData()">Modificar</button>
-        </div>
+        <label for="client">Cliente:</label>
+        <input type="text" id="client" name="client" required>
 
-        <div id="chart"></div>
-        <div id="dataTable"></div>
-    </div>
+        <label for="code">Código:</label>
+        <input type="text" id="code" name="code" required>
+
+        <label for="description">Descrição:</label>
+        <input type="text" id="description" name="description" required>
+
+        <label for="priority">Prioridade:</label>
+        <select id="priority" name="priority" required>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+        </select>
+
+        <label for="progress">Progresso:</label>
+        <input type="text" id="progress" name="progress" required>
+
+        <label for="status">Status:</label>
+        <input type="text" id="status" name="status" required>
+
+        <label for="date">Data:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit">Incluir Dados</button>
+    </form>
+
+    <div id="dataTable"></div>
+    <div id="chart"></div>
 
     <script src="script.js"></script>
 </body>
