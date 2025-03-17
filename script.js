@@ -10,11 +10,10 @@ document.getElementById('dataForm').addEventListener('submit', function(event) {
 });
 
 function appendData(data) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H:append?valueInputOption=RAW`, {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H:append?valueInputOption=RAW&key=${API_KEY}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
             values: [data]
@@ -22,10 +21,13 @@ function appendData(data) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Dados inseridos com sucesso:', data);
+        document.getElementById('message').textContent = 'Dados inseridos com sucesso!';
         loadData();
     })
-    .catch(error => console.error('Erro ao inserir dados:', error));
+    .catch(error => {
+        console.error('Erro ao inserir dados:', error);
+        document.getElementById('message').textContent = 'Erro ao inserir dados.';
+    });
 }
 
 function loadData() {
@@ -68,18 +70,9 @@ function searchData() {
     .catch(error => console.error('Erro ao pesquisar dados:', error));
 }
 
-function editData(rowIndex) {
-    // Implementar a lógica para editar dados
-    console.log('Editar linha:', rowIndex);
-}
-
 function deleteData(rowIndex) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?valueInputOption=RAW`, {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?key=${API_KEY}`, {
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
-        }
     })
     .then(response => response.json())
     .then(data => {
