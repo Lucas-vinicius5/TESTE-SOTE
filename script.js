@@ -1,86 +1,85 @@
-const SHEET_ID = '1jLGdcmLq-4BgaYwXN9WewsH4slUDTwKA5H4XEsMIv5w';
-const API_KEY = 'AIzaSyDJcmG7-_yl0TXrbRbF6u4U0lfvmL-SXhA';
-const SHEET_NAME = 'Dados Site';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Dados</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Dados</h1>
 
-document.getElementById('dataForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = Array.from(formData.values());
-    appendData(data);
-});
+        <!-- Formulário para inserir dados -->
+        <form id="dataForm">
+            <h2>Inserir Dados</h2>
+            <div class="form-group">
+                <label for="orderNumber">Número do Pedido:</label>
+                <input type="text" id="orderNumber" name="orderNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="client">Cliente:</label>
+                <input type="text" id="client" name="client" required>
+            </div>
+            <div class="form-group">
+                <label for="code">Código:</label>
+                <input type="text" id="code" name="code" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição:</label>
+                <input type="text" id="description" name="description" required>
+            </div>
+            <div class="form-group">
+                <label for="priority">Prioridade:</label>
+                <input type="text" id="priority" name="priority" required>
+            </div>
+            <div class="form-group">
+                <label for="progress">Progresso:</label>
+                <input type="text" id="progress" name="progress" required>
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <input type="text" id="status" name="status" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Data:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <button type="submit">Incluir Dados</button>
+            <p id="message"></p>
+        </form>
 
-function appendData(data) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H:append?valueInputOption=RAW&key=${API_KEY}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            values: [data]
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('message').textContent = 'Dados inseridos com sucesso!';
-        loadData();
-    })
-    .catch(error => {
-        console.error('Erro ao inserir dados:', error);
-        document.getElementById('message').textContent = 'Erro ao inserir dados.';
-    });
-}
+        <!-- Pesquisar dados -->
+        <div class="search-section">
+            <h2>Pesquisar Dados</h2>
+            <input type="text" id="searchInput" placeholder="Pesquisar por Número do Pedido">
+            <button onclick="searchData()">Pesquisar</button>
+        </div>
 
-function loadData() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
-    .then(response => response.json())
-    .then(data => {
-        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        data.values.forEach((row, index) => {
-            const newRow = tableBody.insertRow();
-            row.forEach((cell, cellIndex) => {
-                const newCell = newRow.insertCell(cellIndex);
-                newCell.textContent = cell;
-            });
-            const actionCell = newRow.insertCell(row.length);
-            actionCell.innerHTML = `<button onclick="editData(${index + 2})">Editar</button> <button onclick="deleteData(${index + 2})">Excluir</button>`;
-        });
-    })
-    .catch(error => console.error('Erro ao carregar dados:', error));
-}
+        <!-- Tabela de dados -->
+        <div class="table-section">
+            <h2>Dados</h2>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Número do Pedido</th>
+                        <th>Cliente</th>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Prioridade</th>
+                        <th>Progresso</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados serão inseridos aqui via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-function searchData() {
-    const searchValue = document.getElementById('searchInput').value;
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
-    .then(response => response.json())
-    .then(data => {
-        const filteredData = data.values.filter(row => row[0] === searchValue);
-        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        filteredData.forEach(row => {
-            const newRow = tableBody.insertRow();
-            row.forEach((cell, cellIndex) => {
-                const newCell = newRow.insertCell(cellIndex);
-                newCell.textContent = cell;
-            });
-            const actionCell = newRow.insertCell(row.length);
-            actionCell.innerHTML = `<button onclick="editData(${data.values.indexOf(row) + 2})">Editar</button> <button onclick="deleteData(${data.values.indexOf(row) + 2})">Excluir</button>`;
-        });
-    })
-    .catch(error => console.error('Erro ao pesquisar dados:', error));
-}
-
-function deleteData(rowIndex) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?key=${API_KEY}`, {
-        method: 'DELETE',
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Dados excluídos com sucesso:', data);
-        loadData();
-    })
-    .catch(error => console.error('Erro ao excluir dados:', error));
-}
-
-// Carregar dados ao iniciar
-loadData();
+    <script src="script.js"></script>
+</body>
+</html>
