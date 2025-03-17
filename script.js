@@ -10,38 +10,42 @@ document.getElementById('dataForm').addEventListener('submit', function(event) {
 });
 
 function appendData(data) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A1:append?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            range: `${SHEET_NAME}!A1`,
+            range: `${SHEET_NAME}!A2:H2`,
             majorDimension: 'ROWS',
             values: [data]
         })
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro ao inserir dados');
+            throw new Error('Erro na requisição: ' + response.statusText);
         }
         return response.json();
     })
     .then(data => {
         document.getElementById('message').textContent = 'Dados inseridos com sucesso!';
-        loadData();
+        loadData(); // Recarrega os dados após a inserção
     })
     .catch(error => {
         console.error('Erro ao inserir dados:', error);
-        document.getElementById('message').textContent = 'Erro ao inserir dados.';
+        document.getElementById('message').textContent = 'Erro ao inserir dados. Verifique o console para mais detalhes.';
     });
 }
 
 function loadData() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`;
+
+    fetch(url)
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro ao carregar dados');
+            throw new Error('Erro na requisição: ' + response.statusText);
         }
         return response.json();
     })
@@ -58,17 +62,24 @@ function loadData() {
                 const actionCell = newRow.insertCell(row.length);
                 actionCell.innerHTML = `<button onclick="editData(${index + 2})">Editar</button> <button onclick="deleteData(${index + 2})">Excluir</button>`;
             });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="9">Nenhum dado encontrado.</td></tr>';
         }
     })
-    .catch(error => console.error('Erro ao carregar dados:', error));
+    .catch(error => {
+        console.error('Erro ao carregar dados:', error);
+        document.getElementById('message').textContent = 'Erro ao carregar dados. Verifique o console para mais detalhes.';
+    });
 }
 
 function searchData() {
     const searchValue = document.getElementById('searchInput').value;
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`)
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:H?key=${API_KEY}`;
+
+    fetch(url)
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro ao pesquisar dados');
+            throw new Error('Erro na requisição: ' + response.statusText);
         }
         return response.json();
     })
@@ -76,7 +87,7 @@ function searchData() {
         const filteredData = data.values.filter(row => row[0] === searchValue);
         const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
         tableBody.innerHTML = '';
-        if (filteredData && filteredData.length > 0) {
+        if (filteredData.length > 0) {
             filteredData.forEach(row => {
                 const newRow = tableBody.insertRow();
                 row.forEach((cell, cellIndex) => {
@@ -86,26 +97,36 @@ function searchData() {
                 const actionCell = newRow.insertCell(row.length);
                 actionCell.innerHTML = `<button onclick="editData(${data.values.indexOf(row) + 2})">Editar</button> <button onclick="deleteData(${data.values.indexOf(row) + 2})">Excluir</button>`;
             });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="9">Nenhum resultado encontrado.</td></tr>';
         }
     })
-    .catch(error => console.error('Erro ao pesquisar dados:', error));
+    .catch(error => {
+        console.error('Erro ao pesquisar dados:', error);
+        document.getElementById('message').textContent = 'Erro ao pesquisar dados. Verifique o console para mais detalhes.';
+    });
 }
 
 function deleteData(rowIndex) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?key=${API_KEY}`, {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A${rowIndex}:H${rowIndex}?key=${API_KEY}`;
+
+    fetch(url, {
         method: 'DELETE',
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro ao excluir dados');
+            throw new Error('Erro na requisição: ' + response.statusText);
         }
         return response.json();
     })
     .then(data => {
         console.log('Dados excluídos com sucesso:', data);
-        loadData();
+        loadData(); // Recarrega os dados após a exclusão
     })
-    .catch(error => console.error('Erro ao excluir dados:', error));
+    .catch(error => {
+        console.error('Erro ao excluir dados:', error);
+        document.getElementById('message').textContent = 'Erro ao excluir dados. Verifique o console para mais detalhes.';
+    });
 }
 
 // Carregar dados ao iniciar
